@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What's the weather ?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-overcast">
+  <!-- Dynamic Background Canvas & Images -->
+  <div class="bg-wrapper" id="bg-wrapper">
+    <div class="bg-layer active" id="bg-layer-1" style="background-image: url('assets/backgrounds/overcast.jpg');"></div>
+    <div class="bg-layer" id="bg-layer-2"></div>
+    <div class="bg-overlay"></div>
+    <canvas id="weather-particles"></canvas>
+  </div>
+
+  <main class="app-container">
+    <!-- Top Header: Unit Switcher & Quick Search Trigger -->
+    <header class="app-header">
+      <div class="header-left">
+        <span class="app-logo">What's the weather ?</span>
+      </div>
+      <div class="header-right">
+        <!-- Celsius / Fahrenheit Toggle -->
+        <div class="unit-toggle" id="unit-toggle" role="radiogroup" aria-label="Temperature Unit">
+          <button class="unit-btn active" id="unit-c" data-unit="C">°C</button>
+          <button class="unit-btn" id="unit-f" data-unit="F">°F</button>
+          <span class="unit-slider"></span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Dashboard Section -->
+    <section class="dashboard-grid">
+      <!-- TOP CARD: City, Temp, Overcast, AQI, and Top-Right Custom Weather Message -->
+      <article class="glass-card top-card">
+        <div class="top-card-left">
+          <h1 class="location-name" id="location-name">New York</h1>
+          <div class="temp-condition-group">
+            <span class="temperature" id="current-temp">61°</span>
+            <span class="condition-text" id="condition-text">Overcast</span>
+          </div>
+          <div class="air-quality-badge" id="air-quality">
+            <span class="aqi-indicator good" id="aqi-dot"></span>
+            <span id="aqi-text">Air quality : 20 - Good</span>
+          </div>
+        </div>
+
+        <div class="top-card-right">
+          <!-- Customized Message Box (Color: #E6954A at 100% opacity) -->
+          <div class="custom-message-box" id="custom-message-box">
+            <p class="custom-message-text" id="custom-message-text">
+              High Chances of Rain , Carry your Umbrella
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <!-- MIDDLE NAVIGATION SECTION: 5 City Buttons + "Where are You Now ?" -->
+      <nav class="middle-nav-section">
+        <!-- 5 Cities Row: Left-most slot is Recent Search (default Kolkata) -->
+        <div class="city-chips-row" id="city-chips-row">
+          <button class="city-chip active" id="slot-0" data-city="Kolkata">Kolkata</button>
+          <button class="city-chip" id="slot-1" data-city="Delhi">Delhi</button>
+          <button class="city-chip" id="slot-2" data-city="Mumbai">Mumbai</button>
+          <button class="city-chip" id="slot-3" data-city="Bangaluru">Bangaluru</button>
+          <button class="city-chip" id="slot-4" data-city="Hyderabad">Hyderabad</button>
+        </div>
+
+        <!-- "Where are You Now ?" Button -->
+        <div class="location-picker-wrap">
+          <button class="btn-where-now" id="btn-where-now">
+            Where are You Now ?
+          </button>
+        </div>
+      </nav>
+
+      <!-- BOTTOM ROW: Weather Details (6 parameters) + 5-Day Forecast Dual-Line Chart -->
+      <div class="bottom-cards-row">
+        <!-- Weather Details (6 Parameters Grid) -->
+        <article class="glass-card weather-details-card">
+          <h2 class="card-heading">Weather details</h2>
+          <div class="details-grid">
+            <!-- 1. Feels like -->
+            <div class="detail-tile" id="tile-feels-like">
+              <span class="tile-label">Feels like</span>
+              <span class="tile-val" id="val-feels-like">57°</span>
+            </div>
+
+            <!-- 2. Wind Direction & Speed -->
+            <div class="detail-tile" id="tile-wind">
+              <span class="tile-label" id="label-wind">ENE wind</span>
+              <span class="tile-val" id="val-wind">21 km/h</span>
+            </div>
+
+            <!-- 3. Humidity -->
+            <div class="detail-tile" id="tile-humidity">
+              <span class="tile-label">Humidity</span>
+              <span class="tile-val" id="val-humidity">82%</span>
+            </div>
+
+            <!-- 4. Rain / Precipitation (Primary Effect - Highlighted with #E6954A at 30% opacity) -->
+            <div class="detail-tile priority-highlight" id="tile-rain">
+              <span class="tile-label" id="label-rain">RAIN</span>
+              <span class="tile-val" id="val-rain">75%</span>
+            </div>
+
+            <!-- 5. Visibility (km unit) -->
+            <div class="detail-tile" id="tile-visibility">
+              <span class="tile-label">Visibility</span>
+              <span class="tile-val" id="val-visibility">11 km</span>
+            </div>
+
+            <!-- 6. Pressure -->
+            <div class="detail-tile" id="tile-pressure">
+              <span class="tile-label">Pressure</span>
+              <span class="tile-val" id="val-pressure">1022 hPa</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- 5-Day Weather Forecast with Dual-Line Temperature Chart -->
+        <article class="glass-card forecast-card">
+          <h2 class="card-heading">5-day weather forecast</h2>
+          <div class="forecast-content">
+            <!-- Days header row with day names & conditions -->
+            <div class="forecast-days-row" id="forecast-days-row">
+              <div class="forecast-day-col" data-index="0">
+                <span class="day-name">Sun</span>
+                <span class="day-icon" title="Rain">🌧️</span>
+              </div>
+              <div class="forecast-day-col" data-index="1">
+                <span class="day-name">Mon</span>
+                <span class="day-icon" title="Cloudy">⛅</span>
+              </div>
+              <div class="forecast-day-col" data-index="2">
+                <span class="day-name">Tue</span>
+                <span class="day-icon" title="Overcast">☁️</span>
+              </div>
+              <div class="forecast-day-col" data-index="3">
+                <span class="day-name">Wed</span>
+                <span class="day-icon" title="Partly Cloudy">⛅</span>
+              </div>
+              <div class="forecast-day-col" data-index="4">
+                <span class="day-name">Thur</span>
+                <span class="day-icon" title="Sunny">☀️</span>
+              </div>
+            </div>
+
+            <!-- Interactive SVG dual-line chart -->
+            <div class="chart-wrapper">
+              <svg id="forecast-chart-svg" class="forecast-chart-svg" viewBox="0 0 500 130" preserveAspectRatio="none">
+                <defs>
+                  <!-- High temp gradient (warm amber / gold) -->
+                  <linearGradient id="high-line-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#F59E0B" />
+                    <stop offset="100%" stop-color="#FBBF24" />
+                  </linearGradient>
+                  <!-- Low temp gradient (vibrant sky blue) -->
+                  <linearGradient id="low-line-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#3B82F6" />
+                    <stop offset="100%" stop-color="#60A5FA" />
+                  </linearGradient>
+                  <!-- Filter for glowing nodes -->
+                  <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#000" flood-opacity="0.5"/>
+                  </filter>
+                </defs>
+
+                <!-- High temperature path -->
+                <path id="path-high" class="chart-path high-path" d="" />
+                <!-- Low temperature path -->
+                <path id="path-low" class="chart-path low-path" d="" />
+
+                <!-- High & Low nodes and label groups injected by JS -->
+                <g id="chart-high-nodes"></g>
+                <g id="chart-low-nodes"></g>
+              </svg>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Footer Controls & Info -->
+    <footer class="app-footer">
+      <div class="live-status">
+        <span class="live-pulse"></span>
+        <span id="update-timestamp">Updated just now</span>
+      </div>
+      <div class="weather-controls-aux">
+        <button id="btn-theme-cycle" class="btn-aux" title="Cycle Weather Theme Preview">
+          <span>🎨 Test Weather States</span>
+        </button>
+      </div>
+    </footer>
+  </main>
+
+  <!-- Location Picker Modal ("Where are You Now ?") -->
+  <div class="modal-backdrop" id="location-modal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Where are You Now ?</h3>
+        <button class="btn-modal-close" id="btn-close-modal" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-gps-wrap">
+          <button class="btn-where-now btn-choose-gps" id="btn-detect-gps">
+            Choose your GPS Location
+          </button>
+        </div>
+        
+        <div class="modal-divider"><span>OR SEARCH A CITY</span></div>
+        
+        <div class="modal-search-wrap">
+          <input 
+            type="text" 
+            id="modal-search-input" 
+            class="modal-search-input" 
+            placeholder="Type city name (e.g. Pune, Jaipur, Chennai, London)..."
+            autocomplete="off"
+            spellcheck="false"
+          >
+          <div id="modal-suggestions" class="modal-suggestions"></div>
+        </div>
+
+        <div class="modal-quick-suggestions">
+          <span class="quick-sugg-label">Popular:</span>
+          <button class="quick-sugg-chip" data-city="Pune">Pune</button>
+          <button class="quick-sugg-chip" data-city="Srinagar">Srinagar</button>
+          <button class="quick-sugg-chip" data-city="London">London</button>
+          <button class="quick-sugg-chip" data-city="Jaipur">Jaipur</button>
+          <button class="quick-sugg-chip" data-city="Chennai">Chennai</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
